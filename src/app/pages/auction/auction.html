@@ -1,0 +1,360 @@
+<div class="auction-root">
+
+  <!-- ══ Status Bar ══════════════════════════════════════════════════════ -->
+  <div class="status-bar">
+    <span class="status-label" [class.status-live]="isActive"
+          [class.status-idle]="isIdle">
+      {{ statusLabel(auctionState.status) }}
+    </span>
+    @if (currentPlayer && !isIdle) {
+      <span class="status-player">Bidding on: <strong>{{ currentPlayer.name }}</strong></span>
+    }
+    <span class="status-spacer"></span>
+    <span class="status-refresh">
+      <mat-icon class="refresh-icon">sync</mat-icon> Auto-refresh every 2s
+    </span>
+  </div>
+
+  <!-- ══ Main 3-Column Grid ══════════════════════════════════════════════ -->
+  <div class="auction-grid">
+
+    <!-- ── LEFT PANEL — Current Player ──────────────────────────────── -->
+    <mat-card class="panel player-panel">
+      <mat-card-header>
+        <mat-card-title class="panel-title">
+          <mat-icon>sports_cricket</mat-icon> Current Player
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        @if (isIdle || !currentPlayer) {
+          <div class="idle-state">
+            <div class="idle-icon">
+              <mat-icon>hourglass_empty</mat-icon>
+            </div>
+            @if (teams.length < 2 || !unsoldPlayersExist) {
+              <p class="idle-text">Setup required to start auction</p>
+              <p class="idle-sub">{{ teams.length < 2 ? 'Add at least 2 teams in Admin panel' : 'Add players in Admin panel' }}</p>
+            } @else {
+              <p class="idle-text">Ready to start auction!</p>
+              <button mat-raised-button class="btn-start-auction-page"
+                      (click)="startAuction()">
+                <mat-icon>play_circle</mat-icon>
+                🏏 Start Auction
+              </button>
+              <div class="queue-counter-page">
+                <mat-icon class="q-icon-sm">queue_play_next</mat-icon>
+                {{ unsoldPlayerCount }} players ready
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Avatar -->
+          <div class="player-avatar-wrap">
+            <img [src]="currentPlayer.profileImageUrl"
+                 [alt]="currentPlayer.name"
+                 class="player-avatar" />
+            <div class="player-avatar-ring"></div>
+          </div>
+
+          <!-- Name -->
+          <h2 class="player-name">{{ currentPlayer.name }}</h2>
+
+          <!-- Role badge -->
+          <div class="role-badge" [class]="roleColors[currentPlayer.role]">
+            {{ currentPlayer.role }}
+          </div>
+
+          <!-- Country & Price -->
+          <div class="player-meta">
+            <div class="meta-item">
+              <mat-icon class="meta-icon">flag</mat-icon>
+              <span>{{ currentPlayer.country }}</span>
+            </div>
+            <div class="meta-item">
+              <mat-icon class="meta-icon">currency_rupee</mat-icon>
+              <span>Base: <strong>{{ formatAmount(currentPlayer.basePrice) }}</strong></span>
+            </div>
+          </div>
+
+          <!-- Stats row -->
+          <div class="stats-row">
+            <div class="stat-item">
+              <span class="stat-val">{{ currentPlayer.stats.matches }}</span>
+              <span class="stat-lbl">Matches</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-val">{{ currentPlayer.stats.runs }}</span>
+              <span class="stat-lbl">Runs</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+              <span class="stat-val">{{ currentPlayer.stats.wickets }}</span>
+              <span class="stat-lbl">Wickets</span>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ── CENTER PANEL — Bidding ────────────────────────────────────── -->
+    <mat-card class="panel bid-panel">
+      <mat-card-header>
+        <mat-card-title class="panel-title">
+          <mat-icon>gavel</mat-icon> Live Bidding
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <!-- Current Bid -->
+        <div class="current-bid-section">
+          <span class="current-bid-label">
+            {{ isActive && !hasOpeningBid ? 'BASE PRICE' : 'CURRENT BID' }}
+          </span>
+          <div class="current-bid-amount"
+               [class.bid-amount-waiting]="isActive && !hasOpeningBid">
+            {{ formatAmount(auctionState ? auctionState.currentBid : 0) }}
+          </div>
+
+          @if (isActive && !hasOpeningBid) {
+            <div class="waiting-bid-text">⏳ Waiting for opening bid…</div>
+          } @else if (currentBiddingTeam) {
+            <div class="bidding-team-badge"
+                 [style.border-color]="currentBiddingTeam.colorCode">
+              <span class="team-color-dot"
+                    [style.background]="currentBiddingTeam.colorCode"></span>
+              <span class="bidding-team-name">{{ currentBiddingTeam.name }}</span>
+              <mat-icon class="leading-icon">emoji_events</mat-icon>
+            </div>
+          } @else {
+            <div class="no-bid-yet">No bids placed yet</div>
+          }
+        </div>
+
+        <!-- ══ SOLD / UNSOLD Action Buttons ═══════════════════════════ -->
+        @if (isActive) {
+          <div class="sold-unsold-row">
+            <button mat-raised-button class="btn-sold-big"
+                    [disabled]="!auctionState.currentBiddingTeamId"
+                    [matTooltip]="!auctionState.currentBiddingTeamId ? 'Wait for a bid before marking Sold' : ''"
+                    (click)="markSold()">
+              <mat-icon>check_circle</mat-icon>
+              ✅ SOLD
+              @if (currentBiddingTeam) {
+                — {{ currentBiddingTeam.shortName }}
+              }
+            </button>
+            <button mat-stroked-button class="btn-unsold-big"
+                    matTooltip="Mark as Unsold and load next player"
+                    (click)="markUnsold()">
+              <mat-icon>cancel</mat-icon>
+              ❌ UNSOLD
+            </button>
+          </div>
+        }
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <!-- Bid Increment Buttons (Step 2 — after opening bid placed) -->
+        @if (isActive && hasOpeningBid) {
+          <div class="bid-section"
+               [class.bid-section-leading]="selectedTeamId !== null && isTeamLeading(selectedTeamId)">
+
+            <div class="bid-section-header">
+              @if (selectedTeam) {
+                <span class="selected-team-info">
+                  Bidding as:
+                  <span class="selected-team-dot"
+                        [style.background]="selectedTeam.colorCode"></span>
+                  <strong>{{ selectedTeam.shortName }}</strong>
+                  ({{ formatAmount(selectedTeam.remainingBudget) }} left)
+                </span>
+                @if (isTeamLeading(selectedTeam.id)) {
+                  <div class="leading-banner">
+                    <span>👑 Leading — wait for another team to bid</span>
+                  </div>
+                }
+              } @else {
+                <span class="bid-hint">↓ Select a team below to bid</span>
+              }
+            </div>
+
+            <div class="increment-buttons">
+              @for (inc of increments; track inc.value) {
+                <button mat-raised-button
+                        class="increment-btn"
+                        [class.increment-btn-active]="selectedTeamId !== null && !isTeamLeading(selectedTeamId!)"
+                        [disabled]="!selectedTeamId || isTeamLeading(selectedTeamId) || !canSelectedTeamBid(inc.value)"
+                        (click)="placeBid(inc.value)"
+                        [matTooltip]="!selectedTeamId ? 'Select a team first' :
+                                      isTeamLeading(selectedTeamId) ? 'You are currently leading! Wait for another team to bid.' : ''">
+                  {{ inc.label }}
+                </button>
+              }
+            </div>
+
+          </div>
+
+          <mat-divider class="section-divider"></mat-divider>
+        } @else if (isIdle) {
+          <div class="bid-idle-wrap">
+            <button mat-raised-button class="btn-start-bid-center"
+                    [disabled]="!canStartAuction"
+                    (click)="startAuction()">
+              <mat-icon>play_circle</mat-icon>
+              🏏 START AUCTION
+            </button>
+            @if (teams.length < 2) {
+              <div class="readiness-msg readiness-warn">
+                <mat-icon>group_add</mat-icon>
+                Add at least 2 teams to begin
+              </div>
+            } @else if (!auctionReadiness.allowed) {
+              <div class="readiness-msg readiness-warn">
+                <mat-icon>warning</mat-icon>
+                ⚠️ Need {{ auctionReadiness.remaining }} more players.
+                Only {{ auctionReadiness.unsoldCount }}/25 available.
+              </div>
+            } @else {
+              <div class="readiness-msg readiness-ok">
+                <mat-icon>check_circle</mat-icon>
+                ✅ {{ auctionReadiness.unsoldCount }} players ready for auction!
+              </div>
+            }
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+        }
+
+        <!-- Bid History -->
+        <div class="bid-history-section">
+          <h4 class="sub-heading">
+            <mat-icon>history</mat-icon> Bid History
+          </h4>
+
+          @if (recentBids.length === 0) {
+            <p class="empty-history">No bids yet.</p>
+          } @else {
+            <div class="bid-history-scroll">
+              <div class="bid-history-list">
+              @for (bid of recentBids; track bid.timestamp; let i = $index) {
+                <div class="bid-history-item" [class.bid-history-latest]="i === 0">
+                  <span class="bid-history-dot"
+                        [style.background]="getTeamById(bid.teamId)?.colorCode ?? '#fff'">
+                  </span>
+                  <span class="bid-history-team">
+                    @if (bid.type === 'opening') { 🏏 }
+                    {{ getTeamById(bid.teamId)?.shortName ?? bid.teamId }}
+                  </span>
+                  <span class="bid-history-amount">{{ formatAmount(bid.bidAmount) }}</span>
+                  <span class="bid-history-time">{{ formatTime(bid.timestamp) }}</span>
+                </div>
+              }
+              </div>
+            </div>
+          }
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+    <!-- ── RIGHT PANEL — Teams Budget ───────────────────────────────── -->
+    <mat-card class="panel budget-panel">
+      <mat-card-header>
+        <mat-card-title class="panel-title">
+          <mat-icon>account_balance_wallet</mat-icon> Team Budgets
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="team-budget-scroll">
+          <div class="team-budget-list">
+          @for (team of teams; track team.id) {
+            <div class="team-budget-row"
+                 [class.team-leading]="isCurrentBidder(team.id)"
+                 [style.border-left-color]="isCurrentBidder(team.id) ? '#ffd700' : 'transparent'">
+              <div class="team-budget-header">
+                <span class="team-color-dot" [style.background]="team.colorCode"></span>
+                <span class="team-short">{{ team.shortName }}</span>
+                @if (isCurrentBidder(team.id)) {
+                  <span class="leading-badge">👑 Leading</span>
+                }
+                <span class="team-budget-val">{{ formatAmount(team.remainingBudget) }}</span>
+              </div>
+              <mat-progress-bar
+                mode="determinate"
+                [value]="getBudgetPercent(team)"
+                [class]="getBudgetColorClass(team)">
+              </mat-progress-bar>
+              <div class="team-budget-sub">
+                {{ getBudgetPercent(team).toFixed(0) }}% remaining of
+                {{ formatAmount(team.totalBudget) }}
+              </div>
+            </div>
+          }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  <!-- ══ BOTTOM — Team Bidding Panel ════════════════════════════════════ -->
+  @if (isActive) {
+    <mat-card class="panel team-selector-panel">
+      <mat-card-header>
+        <mat-card-title class="panel-title">
+          <mat-icon>groups</mat-icon>
+          @if (waitingForOpeningBid) {
+            Place Opening Bid for {{ currentPlayer?.name }}
+          } @else {
+            Select Your Team to Raise the Bid
+          }
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <!-- STEP 1: No bids yet — each team gets one big opening-bid button -->
+        @if (waitingForOpeningBid) {
+          <div class="opening-bid-grid">
+            @for (team of teams; track team.id) {
+              <button class="btn-opening-bid"
+                      [class.btn-opening-cant-afford]="team.remainingBudget < (currentPlayer?.basePrice ?? 0)"
+                      [disabled]="team.remainingBudget < (currentPlayer?.basePrice ?? 0)"
+                      [style.--team-color]="team.colorCode"
+                      (click)="placeOpeningBid(team)"
+                      [matTooltip]="team.remainingBudget < (currentPlayer?.basePrice ?? 0) ? 'Insufficient budget' : ''">
+                <span class="open-bid-short">{{ team.shortName }}</span>
+                <span class="open-bid-price">🏏 {{ formatAmount(currentPlayer?.basePrice ?? 0) }}</span>
+              </button>
+            }
+          </div>
+
+        <!-- STEP 2: Bids in progress — select team and use center panel increment buttons -->
+        } @else {
+          <div class="team-selector-grid">
+            @for (team of teams; track team.id) {
+              <button
+                class="team-selector-btn"
+                [class.team-btn-selected]="selectedTeamId === team.id"
+                [class.team-btn-leading]="isCurrentBidder(team.id)"
+                [class.team-btn-disabled]="!teamCanAfford(team)"
+                [style.--team-color]="team.colorCode"
+                [disabled]="!teamCanAfford(team)"
+                (click)="selectTeam(team.id)"
+                matRipple>
+                <span class="team-btn-short">{{ team.shortName }}</span>
+                <span class="team-btn-budget">{{ formatAmount(team.remainingBudget) }}</span>
+                @if (isCurrentBidder(team.id)) {
+                  <span class="team-btn-crown">👑</span>
+                }
+              </button>
+            }
+          </div>
+        }
+
+      </mat-card-content>
+    </mat-card>
+  }
+
+</div>

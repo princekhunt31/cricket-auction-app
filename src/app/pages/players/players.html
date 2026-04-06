@@ -1,0 +1,251 @@
+<div class="players-root">
+
+  <!-- ══ Page Header ══════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon"><mat-icon>sports_cricket</mat-icon></div>
+      <div>
+        <h1 class="page-title">Players</h1>
+        <p class="page-subtitle">Browse the full auction player pool</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><span class="hstat-val">{{ totalPlayers }}</span><span class="hstat-lbl">Total</span></div>
+      <div class="hstat"><span class="hstat-val sold-val">{{ soldCount }}</span><span class="hstat-lbl">Sold</span></div>
+      <div class="hstat"><span class="hstat-val">{{ unsoldCount }}</span><span class="hstat-lbl">Unsold</span></div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 1 — Filter Bar ════════════════════════════════════════════ -->
+  <div class="filter-bar">
+
+    <!-- Search -->
+    <mat-form-field appearance="outline" class="filter-field search-field">
+      <mat-label>Search players</mat-label>
+      <input matInput [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
+             placeholder="e.g. Virat Kohli">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!-- Role -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Role</mat-label>
+      <mat-select [(ngModel)]="roleFilter" (ngModelChange)="applyFilters()">
+        @for (role of roles; track role) {
+          <mat-option [value]="role">{{ role === 'All' ? 'All Roles' : role }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Country -->
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Country</mat-label>
+      <mat-select [(ngModel)]="countryFilter" (ngModelChange)="applyFilters()">
+        <mat-option value="All">All Countries</mat-option>
+        @for (country of countries; track country) {
+          <mat-option [value]="country">{{ country }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <!-- Status Toggle -->
+    <mat-button-toggle-group [(ngModel)]="statusFilter"
+                             (ngModelChange)="applyFilters()"
+                             class="status-toggle">
+      @for (s of statuses; track s) {
+        <mat-button-toggle [value]="s" class="toggle-btn">
+          {{ s === 'InAuction' ? '🔴 Live' : s }}
+        </mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <!-- Clear -->
+    @if (hasActiveFilter) {
+      <button mat-stroked-button class="clear-btn" (click)="clearFilters()">
+        <mat-icon>filter_alt_off</mat-icon>
+        Clear
+      </button>
+    }
+  </div>
+
+  <!-- ══ SECTION 2 — Count + Table ══════════════════════════════════════════ -->
+  <div class="table-section">
+    <div class="table-meta">
+      <span class="showing-count">
+        Showing <strong>{{ dataSource.data.length }}</strong> of
+        <strong>{{ totalPlayers }}</strong> players
+      </span>
+      @if (isActive) {
+        <span class="readiness-badge badge-live">🏏 Auction in progress</span>
+      } @else if (!auctionReadiness.allowed) {
+        <span class="readiness-badge badge-warn">⚠️ {{ auctionReadiness.unsoldCount }}/25 minimum players</span>
+      } @else {
+        <span class="readiness-badge badge-ok">✅ {{ auctionReadiness.unsoldCount }} players ready</span>
+      }
+    </div>
+
+    <!-- ── Desktop Table ─────────────────────────────────────────────────── -->
+    <div class="table-wrap">
+      <mat-table [dataSource]="dataSource" matSort class="players-table">
+
+        <!-- # Column -->
+        <ng-container matColumnDef="index">
+          <mat-header-cell *matHeaderCellDef class="col-index">#</mat-header-cell>
+          <mat-cell *matCellDef="let player; let i = index" class="col-index">
+            {{ getRowIndex(i) }}
+          </mat-cell>
+        </ng-container>
+
+        <!-- Avatar Column -->
+        <ng-container matColumnDef="avatar">
+          <mat-header-cell *matHeaderCellDef class="col-avatar"></mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-avatar">
+            <img [src]="player.profileImageUrl" [alt]="player.name"
+                 class="table-avatar" [matTooltip]="player.name" />
+          </mat-cell>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="col-name">Name</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-name player-name-cell">
+            {{ player.name }}
+          </mat-cell>
+        </ng-container>
+
+        <!-- Role Column -->
+        <ng-container matColumnDef="role">
+          <mat-header-cell *matHeaderCellDef class="col-role">Role</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-role">
+            <span class="role-chip" [class]="roleColors[player.role]">
+              {{ player.role }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Country Column -->
+        <ng-container matColumnDef="country">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="col-country">Country</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-country country-cell">
+            {{ player.country }}
+          </mat-cell>
+        </ng-container>
+
+        <!-- Base Price Column -->
+        <ng-container matColumnDef="basePrice">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="col-price">Base Price</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-price">
+            <span class="base-price">{{ formatAmount(player.basePrice) }}</span>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef class="col-status">Status</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-status">
+            <span class="status-chip" [class]="getStatusCls(player)">
+              {{ getStatusLabel(player) }}
+            </span>
+          </mat-cell>
+        </ng-container>
+
+        <!-- Sold Price Column -->
+        <ng-container matColumnDef="soldPrice">
+          <mat-header-cell *matHeaderCellDef mat-sort-header class="col-sold">Sold Price</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-sold">
+            @if (player.soldPrice) {
+              <span class="sold-price-val">{{ formatAmount(player.soldPrice) }}</span>
+            } @else {
+              <span class="dash">—</span>
+            }
+          </mat-cell>
+        </ng-container>
+
+        <!-- Team Column -->
+        <ng-container matColumnDef="team">
+          <mat-header-cell *matHeaderCellDef class="col-team">Team</mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-team">
+            @if (getTeamForPlayer(player); as team) {
+              <span class="team-chip">
+                <span class="team-dot" [style.background]="team.colorCode"></span>
+                {{ team.shortName }}
+              </span>
+            } @else {
+              <span class="dash">—</span>
+            }
+          </mat-cell>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef class="col-actions"></mat-header-cell>
+          <mat-cell *matCellDef="let player" class="col-actions" (click)="$event.stopPropagation()">
+            <button mat-icon-button
+                    [disabled]="!canDeletePlayer(player)"
+                    [class.delete-btn-enabled]="canDeletePlayer(player)"
+                    [class.delete-btn-disabled]="!canDeletePlayer(player)"
+                    [matTooltip]="getDeleteTooltip(player)"
+                    matTooltipPosition="left"
+                    (click)="deletePlayer(player, $event)"
+                    aria-label="Delete player">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"
+                 class="player-row"
+                 (click)="openPlayerDialog(row)"
+                 matTooltip="Click to view full profile">
+        </mat-row>
+
+        <!-- No data row -->
+        <tr class="mat-row no-data-row" *matNoDataRow>
+          <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+            <div class="empty-state">
+              <mat-icon>person_search</mat-icon>
+              <p>No players match your filters</p>
+              <button mat-stroked-button class="clear-empty-btn" (click)="clearFilters()">
+                Clear Filters
+              </button>
+            </div>
+          </td>
+        </tr>
+
+      </mat-table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50]"
+                     pageSize="10"
+                     showFirstLastButtons
+                     class="players-paginator">
+      </mat-paginator>
+    </div>
+
+    <!-- ── Mobile Card Grid ──────────────────────────────────────────────── -->
+    <div class="mobile-cards">
+      @for (player of dataSource.data; track player.id) {
+        <div class="mobile-card" (click)="openPlayerDialog(player)">
+          <img [src]="player.profileImageUrl" [alt]="player.name" class="mobile-avatar" />
+          <div class="mobile-info">
+            <span class="mobile-name">{{ player.name }}</span>
+            <div class="mobile-meta">
+              <span class="role-chip sm" [class]="roleColors[player.role]">{{ player.role }}</span>
+              <span class="mobile-country">{{ player.country }}</span>
+            </div>
+          </div>
+          <div class="mobile-right">
+            <span class="status-chip sm" [class]="getStatusCls(player)">
+              {{ getStatusLabel(player) }}
+            </span>
+            @if (player.soldPrice) {
+              <span class="sold-price-val sm">{{ formatAmount(player.soldPrice) }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>

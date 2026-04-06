@@ -1,0 +1,19 @@
+services:
+  - type: static
+    name: cricket-auction-app
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist/cricket-auction-app/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /index.html
+        name: Cache-Control
+        value: no-cache, no-store, must-revalidate
+      - path: /*.js
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /*.css
+        name: Cache-Control
+        value: public, max-age=31536000, immutable

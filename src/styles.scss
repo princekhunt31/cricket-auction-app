@@ -1,1 +1,225 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+// ── Material Theme (Dark navy override) ───────
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+// ── Design Tokens ──────────────────────────────
+:root {
+  --navy-deepest:  #060d1f;
+  --navy-deep:     #0b1733;
+  --navy-mid:      #112244;
+  --navy-light:    #1a3260;
+  --accent-amber:  #f5a623;
+  --accent-gold:   #ffd700;
+  --accent-teal:   #00d4aa;
+  --text-primary:  #e8eaf6;
+  --text-muted:    #8ca0c0;
+  --card-bg:       #0f1e3a;
+  --card-border:   rgba(245, 166, 35, 0.12);
+}
+
+// ── Base Reset ─────────────────────────────────
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--navy-deepest);
+  color: var(--text-primary);
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// ── Scrollbar Styling ──────────────────────────
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: var(--navy-deepest); }
+::-webkit-scrollbar-thumb  { background: var(--navy-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-amber); }
+
+// ═══════════════════════════════════════════════
+//   SHARED PAGE COMPONENT STYLES
+// ═══════════════════════════════════════════════
+.page-container {
+  padding: 40px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 600px) {
+    padding: 24px 16px;
+  }
+}
+
+// ── Page Hero ──────────────────────────────────
+.page-hero {
+  text-align: center;
+  padding: 48px 24px 40px;
+  position: relative;
+  margin-bottom: 40px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(245, 166, 35, 0.08), transparent);
+    pointer-events: none;
+  }
+}
+
+.page-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+  border: 2px solid rgba(245, 166, 35, 0.3);
+  border-radius: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+              0 0 24px rgba(245, 166, 35, 0.1);
+
+  .material-icons {
+    font-size: 36px;
+    color: var(--accent-amber);
+  }
+}
+
+.live-pulse .material-icons {
+  animation: icon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes icon-pulse {
+  0%, 100% { color: var(--accent-amber); filter: drop-shadow(0 0 4px rgba(245, 166, 35, 0.4)); }
+  50%       { color: #ff4545;            filter: drop-shadow(0 0 12px rgba(255, 69, 69, 0.8)); }
+}
+
+.page-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-amber) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 540px;
+  margin-inline: auto;
+  line-height: 1.6;
+}
+
+// ── Live Badge ─────────────────────────────────
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 69, 69, 0.12);
+  border: 1px solid rgba(255, 69, 69, 0.35);
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff4545;
+    animation: blink-dot 1.2s ease infinite;
+  }
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.2; }
+}
+
+// ── Stats Grid ─────────────────────────────────
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(245, 166, 35, 0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(245, 166, 35, 0.08);
+    border-color: rgba(245, 166, 35, 0.3);
+
+    &::before { opacity: 1; }
+  }
+
+  &.accent {
+    background: linear-gradient(135deg, rgba(245, 166, 35, 0.12), rgba(255, 215, 0, 0.06));
+    border-color: rgba(245, 166, 35, 0.35);
+  }
+}
+
+.stat-icon {
+  font-size: 30px !important;
+  color: var(--accent-amber);
+  margin-bottom: 4px;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}

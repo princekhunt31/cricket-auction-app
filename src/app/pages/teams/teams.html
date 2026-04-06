@@ -1,0 +1,134 @@
+<div class="teams-root">
+
+  <!-- ══ Page Header ══════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>shield</mat-icon>
+      </div>
+      <div>
+        <h1 class="page-title">IPL Franchise Teams</h1>
+        <p class="page-subtitle">Live budget tracker · Auto-refreshes every 3 seconds</p>
+      </div>
+    </div>
+    <span class="refresh-chip">
+      <mat-icon class="spin-icon">sync</mat-icon>
+      Live
+    </span>
+  </div>
+
+  <!-- ══ SECTION 1 — Teams Grid ════════════════════════════════════════════ -->
+  <div class="teams-grid">
+    @for (team of teams; track team.id) {
+      <mat-card class="team-card" [class]="'team-card-' + team.shortName.toLowerCase()">
+
+        <!-- Colored Top Banner -->
+        <div class="team-banner" [style.background]="team.colorCode">
+          <div class="banner-overlay"></div>
+          <span class="banner-short">{{ team.shortName }}</span>
+          <span class="banner-full">{{ team.name }}</span>
+          <div class="banner-badge">
+            <mat-icon>groups</mat-icon>
+            {{ getTeamPlayers(team).length }} Players
+          </div>
+        </div>
+
+        <mat-card-content class="team-body">
+
+          <!-- Budget Row -->
+          <div class="budget-row">
+            <span class="budget-label">Remaining Budget</span>
+            <span class="budget-value">{{ budgetDisplay(team) }}</span>
+          </div>
+
+          <!-- Budget Health Label -->
+          <div class="budget-health-row">
+            <span class="budget-health-label" [class]="getBudgetColorClass(team)">
+              ● {{ getBudgetLabel(team) }}
+            </span>
+            <span class="budget-pct">{{ getBudgetPercent(team).toFixed(0) }}%</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <mat-progress-bar
+            mode="determinate"
+            [value]="getBudgetPercent(team)"
+            [class]="getBudgetColorClass(team)"
+            class="budget-bar">
+          </mat-progress-bar>
+
+          <!-- Players Info -->
+          <div class="players-row">
+            <mat-icon class="players-icon">people</mat-icon>
+            <span class="players-text">
+              <strong>{{ getTeamPlayers(team).length }}</strong> Players Bought
+            </span>
+          </div>
+
+          <!-- Player Avatars Preview -->
+          @if (getTeamPlayers(team).length > 0) {
+            <div class="avatar-stack">
+              @for (player of getTeamPlayers(team).slice(0, 5); track player.id) {
+                <img [src]="player.profileImageUrl"
+                     [alt]="player.name"
+                     class="stack-avatar"
+                     [matTooltip]="player.name" />
+              }
+              @if (getTeamPlayers(team).length > 5) {
+                <div class="stack-more">+{{ getTeamPlayers(team).length - 5 }}</div>
+              }
+            </div>
+          }
+
+        </mat-card-content>
+
+        <!-- View Squad Button -->
+        <mat-card-actions class="team-actions">
+          <button mat-stroked-button class="view-squad-btn"
+                  [style.border-color]="team.colorCode"
+                  [style.color]="team.colorCode"
+                  (click)="openSquad(team)">
+            <mat-icon>group</mat-icon>
+            View Squad
+          </button>
+        </mat-card-actions>
+
+      </mat-card>
+    }
+  </div>
+
+  <!-- ══ SECTION 2 — Summary Stats ══════════════════════════════════════════ -->
+  <div class="summary-section">
+    <h2 class="summary-heading">
+      <mat-icon>bar_chart</mat-icon>
+      Auction Summary
+    </h2>
+
+    <div class="summary-grid">
+      <div class="stat-card">
+        <mat-icon class="stat-icon icon-blue">sports_cricket</mat-icon>
+        <span class="stat-val">{{ players.length }}</span>
+        <span class="stat-lbl">Total Players</span>
+      </div>
+
+      <div class="stat-card">
+        <mat-icon class="stat-icon icon-green">check_circle</mat-icon>
+        <span class="stat-val">{{ totalSold }}</span>
+        <span class="stat-lbl">Players Sold</span>
+      </div>
+
+      <div class="stat-card">
+        <mat-icon class="stat-icon icon-amber">hourglass_empty</mat-icon>
+        <span class="stat-val">{{ totalUnsold }}</span>
+        <span class="stat-lbl">Players Unsold</span>
+      </div>
+
+      <div class="stat-card accent">
+        <mat-icon class="stat-icon icon-gold">currency_rupee</mat-icon>
+        <span class="stat-val">{{ formatAmount(totalMoneySpent) }}</span>
+        <span class="stat-lbl">Total Money Spent</span>
+      </div>
+    </div>
+  </div>
+
+</div>

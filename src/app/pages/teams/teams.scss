@@ -1,0 +1,383 @@
+/* ════════════════════════════════════════════
+   TEAMS PAGE STYLES  ·  Dark Navy Theme
+   ════════════════════════════════════════════ */
+
+$bg:       #0a0e1a;
+$surface:  #0f1629;
+$surface2: #152040;
+$border:   rgba(255, 215, 0, 0.12);
+$gold:     #ffd700;
+$amber:    #f5a623;
+$text:     #e8eaf6;
+$muted:    #7a8bb0;
+$green:    #00e676;
+$yellow-c: #ffeb3b;
+$red-c:    #ff5252;
+$radius:   18px;
+
+// ── Root ──────────────────────────────────────
+.teams-root {
+  background: $bg;
+  min-height: 100vh;
+  padding: 24px 28px 48px;
+  color: $text;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+
+  @media (max-width: 768px) { padding: 14px 14px 36px; gap: 20px; }
+}
+
+// ── Page Header ───────────────────────────────
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 24px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba($gold, 0.15), rgba($amber, 0.08));
+  border: 1px solid rgba($gold, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mat-icon {
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+    color: $gold;
+  }
+}
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 4px;
+  background: linear-gradient(135deg, $text 0%, $gold 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.page-subtitle {
+  font-size: 0.82rem;
+  color: $muted;
+  margin: 0;
+}
+.refresh-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba($green, 0.1);
+  border: 1px solid rgba($green, 0.25);
+  color: $green;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.spin-icon {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  animation: spin 3s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+// ── Teams Grid ────────────────────────────────
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1200px) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 900px)  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px)  { grid-template-columns: 1fr; }
+}
+
+// ── Team Card ─────────────────────────────────
+.team-card {
+  background: $surface !important;
+  border: 1px solid $border !important;
+  border-radius: $radius !important;
+  color: $text !important;
+  overflow: hidden !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+
+  &:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .mat-mdc-card-content { padding: 16px !important; flex: 1 !important; }
+  .mat-mdc-card-actions { padding: 0 16px 16px !important; }
+}
+
+// ── Team Banner ───────────────────────────────
+.team-banner {
+  position: relative;
+  padding: 24px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  min-height: 110px;
+}
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.45) 100%);
+  pointer-events: none;
+}
+.banner-short {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+.banner-full {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+}
+.banner-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  z-index: 2;
+  mat-icon { font-size: 12px !important; width: 12px !important; height: 12px !important; }
+}
+
+// ── Card Body ─────────────────────────────────
+.team-body { display: flex; flex-direction: column; gap: 10px; }
+
+.budget-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+}
+.budget-label { color: $muted; }
+.budget-value { font-weight: 700; color: $text; font-size: 0.85rem; }
+
+.budget-health-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+}
+.budget-health-label {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  &.budget-green  { color: $green; }
+  &.budget-yellow { color: $yellow-c; }
+  &.budget-red    { color: $red-c; }
+}
+.budget-pct { color: $muted; }
+
+.budget-bar { border-radius: 4px; height: 6px; }
+
+// Progress bar colour classes
+.budget-green ::ng-deep .mdc-linear-progress__bar-inner   { border-color: $green !important; }
+.budget-yellow ::ng-deep .mdc-linear-progress__bar-inner  { border-color: $yellow-c !important; }
+.budget-red ::ng-deep .mdc-linear-progress__bar-inner     { border-color: $red-c !important; }
+::ng-deep .mdc-linear-progress__track { background-color: rgba(255,255,255,0.08) !important; }
+
+.players-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: $muted;
+  strong { color: $text; }
+}
+.players-icon {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: $amber;
+}
+
+// ── Avatar Stack ──────────────────────────────
+.avatar-stack {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+}
+.stack-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid $surface;
+  margin-left: -8px;
+  transition: transform 0.2s;
+  &:first-child { margin-left: 0; }
+  &:hover { transform: translateY(-3px) scale(1.1); z-index: 10; }
+}
+.stack-more {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: $surface2;
+  border: 2px solid $border;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: $muted;
+  margin-left: -8px;
+}
+
+// ── View Squad Button ─────────────────────────
+.view-squad-btn {
+  width: 100%;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  transition: all 0.2s !important;
+
+  &:hover {
+    background: rgba(255,255,255,0.04) !important;
+    transform: translateY(-1px);
+  }
+  mat-icon {
+    margin-right: 6px;
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+// ── Summary Section ───────────────────────────
+.summary-section {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  padding: 24px;
+}
+
+.summary-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: $text;
+  margin: 0 0 20px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: $amber;
+  }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  @media (max-width: 900px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+  background: $surface2;
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  cursor: default;
+
+  &:hover {
+    transform: translateY(-4px);
+    border-color: rgba($gold, 0.25);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+
+  &.accent {
+    background: rgba($gold, 0.05);
+    border-color: rgba($gold, 0.25);
+  }
+}
+
+.stat-icon {
+  font-size: 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+
+  &.icon-blue   { color: #64b5f6; }
+  &.icon-green  { color: $green; }
+  &.icon-amber  { color: $amber; }
+  &.icon-gold   { color: $gold; }
+}
+
+.stat-val {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: $text;
+  letter-spacing: -0.5px;
+}
+
+.stat-lbl {
+  font-size: 0.72rem;
+  color: $muted;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+  text-align: center;
+}
+
+// ── Global Bottom Sheet ───────────────────────
+::ng-deep {
+  .dark-bottom-sheet .mat-bottom-sheet-container {
+    background: #0f1629 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 0 !important;
+    max-height: 80vh !important;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.6) !important;
+  }
+}

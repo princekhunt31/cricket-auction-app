@@ -1,0 +1,91 @@
+<mat-sidenav-container class="sidenav-container">
+
+  <!-- ─── Mobile Sidenav ─── -->
+  <mat-sidenav #sidenav mode="over" position="start" class="mobile-sidenav">
+    <div class="sidenav-header">
+      <span class="sidenav-logo">
+        <span class="material-icons">sports_cricket</span>
+        CricAuction
+      </span>
+      <button mat-icon-button (click)="sidenav.close()" class="sidenav-close-btn" aria-label="Close menu">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <mat-nav-list class="sidenav-nav-list">
+      @for (link of navLinks; track link.path) {
+        <a mat-list-item
+           [routerLink]="link.path"
+           routerLinkActive="sidenav-link-active"
+           class="sidenav-link">
+          <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+          <span matListItemTitle>{{ link.label }}</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <div class="sidenav-footer">
+      <mat-icon>emoji_events</mat-icon>
+      <span>IPL Auction 2025</span>
+    </div>
+  </mat-sidenav>
+
+  <!-- ─── Main Content ─── -->
+  <mat-sidenav-content class="main-content">
+
+    <!-- Top Toolbar -->
+    <mat-toolbar class="app-toolbar">
+      <div class="toolbar-left">
+        <!-- Hamburger: mobile only -->
+        @if (isMobile) {
+          <button mat-icon-button
+                  (click)="toggleSidenav()"
+                  aria-label="Open navigation menu"
+                  class="hamburger-btn">
+            <mat-icon>menu</mat-icon>
+          </button>
+        }
+
+        <!-- Brand -->
+        <a [routerLink]="'/auction'" class="brand-link" aria-label="Home">
+          <span class="brand-icon">
+            <mat-icon>sports_cricket</mat-icon>
+          </span>
+          <span class="brand-name">CricAuction</span>
+          <span class="brand-badge">LIVE</span>
+        </a>
+      </div>
+
+      <!-- Desktop nav links -->
+      @if (!isMobile) {
+        <nav class="desktop-nav" aria-label="Main navigation">
+          @for (link of navLinks; track link.path) {
+            <a mat-button
+               [routerLink]="link.path"
+               routerLinkActive="nav-link-active"
+               class="nav-link">
+              <mat-icon class="nav-link-icon">{{ link.icon }}</mat-icon>
+              {{ link.label }}
+            </a>
+          }
+        </nav>
+      }
+
+      <span class="toolbar-spacer"></span>
+
+      <!-- Right actions -->
+      <button mat-icon-button aria-label="Notifications" class="toolbar-action-btn">
+        <mat-icon>notifications</mat-icon>
+      </button>
+      <button mat-icon-button aria-label="Account" class="toolbar-action-btn">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Page content slot -->
+    <div class="page-content">
+      <ng-content></ng-content>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

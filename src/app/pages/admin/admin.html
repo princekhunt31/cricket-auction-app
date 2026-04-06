@@ -1,0 +1,380 @@
+<div class="admin-root">
+
+  <!-- ══ Page Header ══════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <mat-icon>admin_panel_settings</mat-icon>
+      </div>
+      <div>
+        <h1 class="page-title">Admin Panel</h1>
+        <p class="page-subtitle">Control the live auction, manage players & teams</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <span class="hstat-val">{{ unsoldPlayers.length }}</span>
+        <span class="hstat-lbl">In Queue</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-val">{{ soldPlayers.length }}</span>
+        <span class="hstat-lbl">Sold</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-val">{{ players.length }}</span>
+        <span class="hstat-lbl">Total Players</span>
+      </div>
+      <div class="hstat">
+        <span class="hstat-val">{{ teams.length }}</span>
+        <span class="hstat-lbl">Teams</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECTION 0 — Manage Teams ══════════════════════════════════════════ -->
+  <mat-card class="section-card">
+    <mat-card-header>
+      <mat-card-title class="section-title">
+        <mat-icon>shield</mat-icon>
+        Manage Teams
+        <span class="count-badge">{{ teams.length }}</span>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <!-- Active Auction Warning Banner -->
+      @if (isActive) {
+        <div class="team-lock-banner">
+          <mat-icon>lock</mat-icon>
+          ⚠️ Auction is currently running — team management is locked.
+          Stop the auction first to make changes.
+        </div>
+      }
+
+      <!-- Add Team Form -->
+      <form [formGroup]="teamForm" (ngSubmit)="addTeam()" class="team-form">
+        <div class="team-form-grid">
+
+          <!-- Team Name -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Team Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Prince XI">
+            <mat-icon matSuffix>groups</mat-icon>
+            @if (tf['name'].invalid && tf['name'].touched) {
+              <mat-error>Team name is required (min 2 chars)</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Short Name -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Short Name (max 4)</mat-label>
+            <input matInput formControlName="shortName" placeholder="e.g. PXI"
+                   maxlength="4" (input)="onShortNameInput($event)">
+            <mat-hint align="end">{{ (tf['shortName'].value || '').length }}/4</mat-hint>
+            @if (tf['shortName'].invalid && tf['shortName'].touched) {
+              <mat-error>2–4 uppercase letters required</mat-error>
+            }
+          </mat-form-field>
+
+          <!-- Color Picker -->
+          <mat-form-field appearance="outline" class="form-field color-field">
+            <mat-label>Team Color</mat-label>
+            <input matInput formControlName="colorCode" type="color" class="color-input">
+            <mat-hint>Click to pick team color</mat-hint>
+          </mat-form-field>
+
+          <!-- Budget -->
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Total Budget (Lakhs)</mat-label>
+            <input matInput type="number" formControlName="totalBudget" min="1000">
+            <span matTextPrefix>₹&nbsp;</span>
+            <span matTextSuffix>&nbsp;L</span>
+            @if (tf['totalBudget'].invalid && tf['totalBudget'].touched) {
+              <mat-error>Minimum budget is ₹1000L</mat-error>
+            }
+          </mat-form-field>
+
+        </div>
+
+        <div class="team-form-actions">
+          <button mat-raised-button type="submit" class="btn-add-team">
+            <mat-icon>add</mat-icon>
+            Add Team
+          </button>
+        </div>
+      </form>
+
+      <mat-divider class="inner-divider"></mat-divider>
+
+      <!-- Existing Teams List -->
+      @if (teams.length === 0) {
+        <div class="no-teams-msg">
+          <mat-icon>shield_outlined</mat-icon>
+          <p>No teams yet — add your first team above to get started!</p>
+          <span>You need at least 2 teams to begin the auction.</span>
+        </div>
+      } @else {
+        @if (teams.length < 2) {
+          <div class="teams-warning">
+            <mat-icon>warning</mat-icon>
+            Please add at least 2 teams before starting the auction.
+          </div>
+        }
+        <div class="teams-list">
+          @for (team of teams; track team.id) {
+            <div class="team-row">
+              <span class="team-color-indicator" [style.background]="team.colorCode"></span>
+              <div class="team-row-info">
+                <span class="team-row-name">{{ team.name }}</span>
+                <span class="team-row-short" [style.background]="team.colorCode + '22'"
+                      [style.color]="team.colorCode">{{ team.shortName }}</span>
+              </div>
+              <span class="team-row-budget">{{ formatAmount(team.remainingBudget) }}</span>
+              <span class="team-row-players">
+                <mat-icon class="mini-icon2">people</mat-icon>
+                {{ team.playerIds.length }}
+              </span>
+              <button mat-icon-button
+                      [class.btn-delete-team]="!isActive"
+                      [class.btn-delete-team-locked]="isActive"
+                      [disabled]="isActive"
+                      [matTooltip]="isActive ? 'Cannot delete teams during active auction. Stop the auction first.' : 'Delete team'"
+                      (click)="deleteTeam(team)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ══ AUCTION CONTROL CARD ════════════════════════════════════════════ -->
+  <mat-card class="section-card auction-control-card">
+    <mat-card-header>
+      <mat-card-title class="section-title">
+        <mat-icon>gavel</mat-icon>
+        Auction Control
+        @if (isActive) {
+          <span class="live-pill"><span class="live-dot"></span> LIVE</span>
+        }
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="auction-control-content">
+
+      <!-- START button (idle) -->
+      @if (isIdle) {
+        <div class="start-auction-wrap">
+          <button mat-raised-button class="btn-start-auction"
+                  [disabled]="!canStartAuction"
+                  [matTooltip]="startDisabledReason"
+                  (click)="startAuction()">
+            <mat-icon>play_circle</mat-icon>
+            🏏 START AUCTION
+          </button>
+          @if (teams.length < 2) {
+            <div class="readiness-msg readiness-warn">
+              <mat-icon>group_add</mat-icon>
+              Add at least 2 teams first
+            </div>
+          } @else if (!auctionReadiness.allowed) {
+            <div class="readiness-msg readiness-warn">
+              <mat-icon>warning</mat-icon>
+              ⚠️ Need {{ auctionReadiness.remaining }} more players.
+              Only {{ auctionReadiness.unsoldCount }}/25 available.
+            </div>
+          } @else {
+            <div class="readiness-msg readiness-ok">
+              <mat-icon>check_circle</mat-icon>
+              ✅ {{ auctionReadiness.unsoldCount }} players ready for auction!
+            </div>
+          }
+        </div>
+      }
+
+      <!-- STOP button + progress (active) -->
+      @if (isActive) {
+        <div class="active-control-row">
+          <div class="queue-counter active">
+            <mat-icon class="q-icon">queue_play_next</mat-icon>
+            <span>{{ queueLength }} player{{ queueLength !== 1 ? 's' : '' }} remaining in queue</span>
+          </div>
+          <button mat-stroked-button class="btn-stop-auction"
+                  (click)="stopAuction()">
+            <mat-icon>stop_circle</mat-icon>
+            Stop Auction
+          </button>
+        </div>
+      }
+
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ══ SECTION 3 — Add New Player ════════════════════════════════════════ -->
+  <mat-card class="section-card">
+    <mat-card-header class="expand-header" (click)="formExpanded = !formExpanded"
+                     style="cursor:pointer">
+      <mat-card-title class="section-title">
+        <mat-icon>person_add</mat-icon>
+        Add New Player
+        <mat-icon class="chevron" [class.chevron-open]="formExpanded">
+          expand_more
+        </mat-icon>
+      </mat-card-title>
+    </mat-card-header>
+
+    @if (formExpanded) {
+      <mat-card-content>
+        <form [formGroup]="playerForm" (ngSubmit)="addPlayer()" class="player-form">
+          <div class="form-grid">
+
+            <!-- Name -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Player Name</mat-label>
+              <input matInput formControlName="name" placeholder="e.g. Virat Kohli">
+              <mat-icon matSuffix>person</mat-icon>
+              @if (f['name'].invalid && f['name'].touched) {
+                <mat-error>Name is required (min 2 chars)</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Role -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+                @for (role of roles; track role) {
+                  <mat-option [value]="role">{{ role }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matSuffix>sports_cricket</mat-icon>
+            </mat-form-field>
+
+            <!-- Country -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Country</mat-label>
+              <input matInput formControlName="country" placeholder="e.g. India">
+              <mat-icon matSuffix>flag</mat-icon>
+              @if (f['country'].invalid && f['country'].touched) {
+                <mat-error>Country is required</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Base Price -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Base Price (Lakhs)</mat-label>
+              <input matInput type="number" formControlName="basePrice" min="20">
+              <span matTextPrefix>₹&nbsp;</span>
+              <span matTextSuffix>&nbsp;L</span>
+              @if (f['basePrice'].invalid && f['basePrice'].touched) {
+                <mat-error>Min base price is ₹20L</mat-error>
+              }
+            </mat-form-field>
+
+            <!-- Matches -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Matches Played</mat-label>
+              <input matInput type="number" formControlName="matches" min="0">
+              <mat-icon matSuffix>sports</mat-icon>
+            </mat-form-field>
+
+            <!-- Runs -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Runs Scored</mat-label>
+              <input matInput type="number" formControlName="runs" min="0">
+              <mat-icon matSuffix>trending_up</mat-icon>
+            </mat-form-field>
+
+            <!-- Wickets -->
+            <mat-form-field appearance="outline" class="form-field">
+              <mat-label>Wickets Taken</mat-label>
+              <input matInput type="number" formControlName="wickets" min="0">
+              <mat-icon matSuffix>speed</mat-icon>
+            </mat-form-field>
+
+          </div>
+
+          <div class="form-actions">
+            <button mat-stroked-button type="button" class="btn-cancel-form"
+                    (click)="playerForm.reset({role:'Batsman',basePrice:50,matches:0,runs:0,wickets:0}); formExpanded=false">
+              Cancel
+            </button>
+            <button mat-raised-button type="submit" class="btn-add-player">
+              <mat-icon>add</mat-icon>
+              Add Player
+            </button>
+          </div>
+        </form>
+
+        <!-- Readiness chip (real-time player count) -->
+        @if (!isActive) {
+          <div class="player-readiness-chip"
+               [class.chip-warn]="!auctionReadiness.allowed"
+               [class.chip-ok]="auctionReadiness.allowed">
+            @if (!auctionReadiness.allowed) {
+              📋 {{ auctionReadiness.unsoldCount }}/25 players added —
+              need {{ auctionReadiness.remaining }} more to start auction
+            } @else {
+              ✅ {{ auctionReadiness.unsoldCount }} players ready — you can start auction!
+            }
+          </div>
+        }
+
+      </mat-card-content>
+    }
+  </mat-card>
+
+  <!-- ══ SECTION 4 — Sold Players Summary ══════════════════════════════════ -->
+  @if (soldPlayers.length > 0) {
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title class="section-title">
+          <mat-icon>gavel</mat-icon>
+          Sold Players
+          <span class="count-badge success">{{ soldPlayers.length }}</span>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="sold-grid">
+          @for (player of soldPlayers; track player.id) {
+            <div class="sold-row">
+              <img [src]="player.profileImageUrl" [alt]="player.name" class="sold-avatar" />
+              <div class="sold-info">
+                <span class="sold-name">{{ player.name }}</span>
+                <span class="sold-team">
+                  @if (getTeamById(player.soldToTeamId!); as t) {
+                    <span class="team-dot-sm" [style.background]="t.colorCode"></span>
+                    {{ t.shortName }}
+                  }
+                </span>
+              </div>
+              <span class="sold-price">{{ formatAmount(player.soldPrice!) }}</span>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- ══ SECTION 5 — Danger Zone ════════════════════════════════════════════ -->
+  <mat-card class="section-card danger-card">
+    <mat-card-header>
+      <mat-card-title class="section-title danger-title">
+        <mat-icon>dangerous</mat-icon>
+        Danger Zone
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="danger-content">
+      <div class="danger-desc">
+        <p>Resetting the auction will clear all bids, restore all team budgets to ₹100Cr, and mark all players as Unsold. Use with caution.</p>
+      </div>
+      <button mat-stroked-button class="btn-reset" (click)="openResetDialog()">
+        <mat-icon>restart_alt</mat-icon>
+        Reset Entire Auction
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+</div>

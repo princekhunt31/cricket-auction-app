@@ -1,0 +1,373 @@
+/* ════════════════════════════════════════════
+   PLAYERS PAGE STYLES  ·  Dark Navy Theme
+   ════════════════════════════════════════════ */
+
+$bg:       #0a0e1a;
+$surface:  #0f1629;
+$surface2: #152040;
+$border:   rgba(255, 215, 0, 0.12);
+$gold:     #ffd700;
+$amber:    #f5a623;
+$text:     #e8eaf6;
+$muted:    #7a8bb0;
+$green:    #00e676;
+$orange:   #ff9800;
+$radius:   16px;
+
+// ── Root ──────────────────────────────────────
+.players-root {
+  background: $bg;
+  min-height: 100vh;
+  padding: 24px 28px 48px;
+  color: $text;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 768px) { padding: 14px 14px 36px; }
+}
+
+// ── Page Header ───────────────────────────────
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 24px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+.header-left  { display: flex; align-items: center; gap: 16px; }
+.header-icon  {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg, rgba($gold,.15), rgba($amber,.08));
+  border: 1px solid rgba($gold,.25); display: flex; align-items: center; justify-content: center;
+  mat-icon { font-size: 26px; width: 26px; height: 26px; color: $gold; }
+}
+.page-title   { font-size: 1.6rem; font-weight: 800; margin: 0 0 4px;
+  background: linear-gradient(135deg,$text 0%,$gold 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.page-subtitle{ font-size: .82rem; color: $muted; margin: 0; }
+
+.header-stats { display: flex; gap: 24px; }
+.hstat        { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.hstat-val    { font-size: 1.5rem; font-weight: 800; color: $gold; }
+.hstat-val.sold-val { color: $green; }
+.hstat-lbl    { font-size: .7rem; text-transform: uppercase; letter-spacing: .8px; color: $muted; }
+
+// ── Filter Bar ────────────────────────────────
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+}
+
+.filter-field {
+  flex: 1;
+  min-width: 180px;
+  max-width: 260px;
+
+  ::ng-deep {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing  { border-color: rgba(255,255,255,0.12) !important; }
+    .mdc-text-field--focused .mdc-notched-outline__leading,
+    .mdc-text-field--focused .mdc-notched-outline__notch,
+    .mdc-text-field--focused .mdc-notched-outline__trailing { border-color: $amber !important; }
+    input, .mat-mdc-select-value   { color: $text !important; }
+    .mat-mdc-floating-label        { color: $muted !important; }
+    .mdc-text-field--focused .mat-mdc-floating-label { color: $amber !important; }
+    .mat-mdc-form-field-icon-suffix mat-icon { color: $muted; }
+  }
+}
+
+.search-field { flex: 2; max-width: 340px; }
+
+.status-toggle {
+  background: $surface2 !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 10px !important;
+  overflow: hidden;
+
+  ::ng-deep {
+    .mat-button-toggle-button { color: $muted; background: transparent; }
+    .mat-button-toggle-checked .mat-button-toggle-button { color: $gold; background: rgba($gold,.1); }
+    .mat-button-toggle-appearance-standard { border-color: rgba(255,255,255,0.08) !important; }
+  }
+}
+
+.clear-btn {
+  color: $muted !important;
+  border-color: rgba(255,255,255,0.12) !important;
+  border-radius: 10px !important;
+  white-space: nowrap;
+  &:hover { color: $amber !important; border-color: $amber !important; }
+  mat-icon { font-size: 18px !important; width: 18px !important; height: 18px !important; margin-right: 4px; }
+}
+
+// ── Table Section ─────────────────────────────
+.table-section  { display: flex; flex-direction: column; gap: 10px; }
+
+.table-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.82rem;
+  color: $muted;
+  padding: 0 4px;
+  strong { color: $text; }
+}
+
+.showing-count { font-size: .82rem; }
+
+.table-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 0 10px;
+}
+
+.readiness-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: .78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+.badge-warn { color: #ff9800; background: rgba(255,152,0,.1); border-color: rgba(255,152,0,.3); }
+.badge-ok   { color: #00e676; background: rgba(0,230,118,.08); border-color: rgba(0,230,118,.25); }
+.badge-live { color: #64b5f6; background: rgba(33,150,243,.1); border-color: rgba(33,150,243,.3); }
+
+
+// ── Table Wrap ────────────────────────────────
+.table-wrap {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius;
+  overflow: hidden;
+
+  @media (max-width: 768px) { display: none; }
+}
+
+// ── Material Table ────────────────────────────
+.players-table {
+  width: 100%;
+  background: transparent !important;
+
+  ::ng-deep {
+    .mat-mdc-header-row {
+      background: $surface2 !important;
+      border-bottom: 1px solid $border !important;
+    }
+    .mat-mdc-header-cell {
+      color: $muted !important;
+      font-size: .78rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      border-bottom: none !important;
+    }
+    .mat-mdc-row {
+      background: transparent !important;
+      border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+      transition: background 0.15s ease !important;
+      cursor: pointer;
+      &:hover { background: rgba(255,215,0,0.04) !important; }
+    }
+    .mat-mdc-cell {
+      color: $text !important;
+      border-bottom: none !important;
+      font-size: .88rem !important;
+    }
+    .mat-sort-header-arrow { color: $amber !important; }
+  }
+}
+
+// Column widths
+.col-index   { max-width: 40px !important; min-width: 40px !important; }
+.col-avatar  { max-width: 56px !important; min-width: 56px !important; padding: 8px 4px !important; }
+.col-name    { min-width: 140px; }
+.col-role    { min-width: 130px; }
+.col-country { min-width: 110px; }
+.col-price   { min-width: 90px; }
+.col-status  { min-width: 120px; }
+.col-sold    { min-width: 90px; }
+.col-team    { min-width: 90px; }
+.col-actions { width: 52px; padding: 0 !important; justify-content: center; }
+
+.delete-btn-enabled {
+  color: rgba(#ef5350, 0.7) !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+  &:hover { color: #ef5350 !important; transform: scale(1.15) !important; }
+}
+.delete-btn-disabled {
+  color: rgba(255,255,255,0.15) !important;
+  cursor: default !important;
+}
+
+.table-avatar {
+  width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba($gold,.2);
+  display: block;
+}
+
+.player-name-cell { font-weight: 600 !important; }
+
+.country-cell { color: $muted !important; font-size: .82rem !important; }
+
+.base-price { color: $amber; font-weight: 600; }
+
+.sold-price-val {
+  color: $green; font-weight: 700;
+  &.sm { font-size: .78rem; }
+}
+
+.dash { color: rgba(255,255,255,.25); }
+
+.team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: $surface2;
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: .78rem;
+  font-weight: 600;
+}
+.team-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+
+// ── Chips ─────────────────────────────────────
+.role-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  white-space: nowrap;
+
+  &.sm { font-size: .65rem; padding: 2px 8px; }
+
+  &.role-blue   { background: rgba(33,150,243,.18); color: #64b5f6; border: 1px solid rgba(33,150,243,.3); }
+  &.role-red    { background: rgba(244,67,54,.18);  color: #ef9a9a; border: 1px solid rgba(244,67,54,.3); }
+  &.role-green  { background: rgba(76,175,80,.18);  color: #a5d6a7; border: 1px solid rgba(76,175,80,.3); }
+  &.role-yellow { background: rgba(255,215,0,.15);  color: $gold;   border: 1px solid rgba(255,215,0,.3); }
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  &.sm { font-size: .65rem; padding: 2px 8px; }
+
+  &.status-sold   { background: rgba(0,230,118,.14); color: $green; border: 1px solid rgba(0,230,118,.3); }
+  &.status-unsold { background: rgba(255,255,255,.06); color: $muted; border: 1px solid rgba(255,255,255,.1); }
+  &.status-auction {
+    background: rgba(255,152,0,.14); color: #ffcc80;
+    border: 1px solid rgba(255,152,0,.3);
+    animation: auction-chip 1.5s ease infinite;
+  }
+}
+
+@keyframes auction-chip {
+  0%,100% { box-shadow: 0 0 0 rgba(255,152,0,0); }
+  50%      { box-shadow: 0 0 8px rgba(255,152,0,.4); }
+}
+
+// ── Paginator ─────────────────────────────────
+.players-paginator {
+  background: $surface2 !important;
+  border-top: 1px solid $border !important;
+  color: $muted !important;
+
+  ::ng-deep {
+    .mat-mdc-paginator-container { color: $muted !important; }
+    .mat-mdc-icon-button         { color: $muted !important; }
+    .mat-mdc-select-value        { color: $text !important; }
+    .mat-mdc-paginator-range-label { color: $muted !important; }
+  }
+}
+
+// ── No Data ───────────────────────────────────
+.no-data-row td { padding: 0; }
+.no-data-cell   { padding: 0 !important; }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 12px;
+  mat-icon { font-size: 48px; width: 48px; height: 48px; color: $surface2; }
+  p { color: $muted; margin: 0; font-size: .9rem; }
+}
+.clear-empty-btn {
+  color: $amber !important;
+  border-color: rgba($amber,.3) !important;
+  border-radius: 8px !important;
+}
+
+// ── Mobile Cards ──────────────────────────────
+.mobile-cards {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+
+  @media (max-width: 768px) { display: flex; }
+}
+
+.mobile-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba($gold,.25);
+    transform: translateX(4px);
+  }
+}
+
+.mobile-avatar {
+  width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba($gold,.2); flex-shrink: 0;
+}
+
+.mobile-info    { flex: 1; display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
+.mobile-name    { font-weight: 700; font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mobile-meta    { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.mobile-country { font-size: .75rem; color: $muted; }
+.mobile-right   { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+
+// ── Global dialog ─────────────────────────────
+::ng-deep {
+  .dark-dialog .mat-mdc-dialog-container {
+    --mdc-dialog-container-color: #0f1629;
+  }
+  .mat-mdc-option { background: #0f1629 !important; color: #e8eaf6 !important; }
+  .mat-mdc-option:hover { background: #152040 !important; }
+}
