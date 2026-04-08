@@ -1,0 +1,6 @@
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "outputDirectory": "dist/cricket-auction-app/browser",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci"
+}
