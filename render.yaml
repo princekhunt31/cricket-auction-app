@@ -1,7 +1,7 @@
 services:
   - type: static
     name: cricket-auction-app
-    buildCommand: npm ci && npm run build --configuration=production
+    buildCommand: npm ci && ng build --configuration=production --no-ssr
     staticPublishPath: dist/cricket-auction-app/browser
     routes:
       - type: rewrite
