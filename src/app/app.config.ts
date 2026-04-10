@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
     provideRouter(routes),
-    provideClientHydration(withEventReplay()),
+   // provideClientHydration(withEventReplay()),
     provideAnimations(),
     {
       provide: APP_INITIALIZER,
