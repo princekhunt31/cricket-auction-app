@@ -297,7 +297,51 @@ export class Auction implements OnInit, OnDestroy {
     return this.isActive && !this.hasOpeningBid;
   }
 
-  /** Step 1 — first team to bid accepts the base price */
+  // ── Revert Last Bid ────────────────────────────────────────────────────────
+
+  get canRevert(): boolean {
+    return this.isActive && (this.auctionState?.bidHistory?.length ?? 0) > 0;
+  }
+
+  revertLastBid(): void {
+    if (!this.isActive || !this.currentPlayer) return;
+    const history = [...(this.auctionState.bidHistory ?? [])];
+    if (history.length === 0) return;
+
+    history.pop(); // remove last entry (LIFO)
+
+    let newBid: number;
+    let newBiddingTeamId: string | null;
+    let msg: string;
+
+    if (history.length === 0) {
+      // All bids reverted — back to opening state
+      newBid            = this.currentPlayer.basePrice;
+      newBiddingTeamId  = null;
+      msg = `Opening bid reverted. Back to base price ${this.formatAmount(newBid)}`;
+    } else {
+      // Restore to previous bid
+      const prev        = history[history.length - 1];
+      newBid            = prev.bidAmount;
+      newBiddingTeamId  = prev.teamId;
+      const prevTeam    = this.teams.find(t => t.id === prev.teamId);
+      const teamName    = prevTeam?.name ?? prev.teamId;
+      msg = `Bid reverted! Current lead: ${teamName} at ${this.formatAmount(newBid)}`;
+    }
+
+    const newState: AuctionState = {
+      ...this.auctionState,
+      currentBid:           newBid,
+      currentBiddingTeamId: newBiddingTeamId,
+      bidHistory:           history,
+    };
+
+    this.lsService.saveAuctionState(newState);
+    this.broadcast.publish('BID_PLACED', { auctionState: newState as unknown as Record<string, unknown> });
+    this.refreshState();
+    this.snack(`↩ ${msg}`, 'warn');
+  }
+
   placeOpeningBid(team: Team): void {
     if (!this.currentPlayer || !this.isActive) return;
     if (team.remainingBudget < this.currentPlayer.basePrice) return;

@@ -50,8 +50,6 @@ export class Admin implements OnInit, OnDestroy {
 
   // ── Forms ──────────────────────────────────────────────────────────────────
   teamForm!:   FormGroup;
-  playerForm!: FormGroup;
-  formExpanded = false;
 
   private broadcastSub?: Subscription;
 
@@ -74,7 +72,6 @@ export class Admin implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.buildTeamForm();
-    this.buildPlayerForm();
     this.refreshState();
     this.broadcastSub = this.broadcast.listen().subscribe(() => this.refreshState());
   }
@@ -91,18 +88,6 @@ export class Admin implements OnInit, OnDestroy {
       shortName:   ['', [Validators.required, Validators.maxLength(4), Validators.minLength(2)]],
       colorCode:   ['#3b82f6', Validators.required],
       totalBudget: [10000, [Validators.required, Validators.min(1000)]],
-    });
-  }
-
-  private buildPlayerForm(): void {
-    this.playerForm = this.fb.group({
-      name:      ['', [Validators.required, Validators.minLength(2)]],
-      role:      ['Batsman', Validators.required],
-      country:   ['', Validators.required],
-      basePrice: [50,  [Validators.required, Validators.min(20)]],
-      matches:   [0,   [Validators.required, Validators.min(0)]],
-      runs:      [0,   [Validators.required, Validators.min(0)]],
-      wickets:   [0,   [Validators.required, Validators.min(0)]],
     });
   }
 
@@ -266,26 +251,6 @@ export class Admin implements OnInit, OnDestroy {
     });
   }
 
-  // ── Add Player ─────────────────────────────────────────────────────────────
-
-  addPlayer(): void {
-    if (this.playerForm.invalid) { this.playerForm.markAllAsTouched(); return; }
-    const v = this.playerForm.value;
-    const n = v.name.trim();
-    const newPlayer: Player = {
-      id: `p${Date.now()}`, name: n, role: v.role, country: v.country.trim(),
-      basePrice: +v.basePrice,
-      profileImageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(n)}&background=112244&color=f5a623&bold=true&size=128`,
-      stats: { matches: +v.matches, runs: +v.runs, wickets: +v.wickets },
-      status: 'Unsold', soldPrice: null, soldToTeamId: null,
-    };
-    this.lsService.savePlayers([...this.lsService.getPlayers(), newPlayer]);
-    this.broadcast.publish('PLAYERS_UPDATED', { players: this.lsService.getPlayers() as unknown as Record<string, unknown> });
-    this.refreshState();
-    this.snack(`✅ ${newPlayer.name} added!`, 'success');
-    this.playerForm.reset({ role: 'Batsman', basePrice: 50, matches: 0, runs: 0, wickets: 0 });
-    this.formExpanded = false;
-  }
 
   // ── Reset ──────────────────────────────────────────────────────────────────
 
@@ -321,6 +286,5 @@ export class Admin implements OnInit, OnDestroy {
     });
   }
 
-  get f()  { return this.playerForm.controls; }
   get tf() { return this.teamForm.controls; }
 }

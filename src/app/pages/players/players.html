@@ -9,10 +9,17 @@
         <p class="page-subtitle">Browse the full auction player pool</p>
       </div>
     </div>
-    <div class="header-stats">
-      <div class="hstat"><span class="hstat-val">{{ totalPlayers }}</span><span class="hstat-lbl">Total</span></div>
-      <div class="hstat"><span class="hstat-val sold-val">{{ soldCount }}</span><span class="hstat-lbl">Sold</span></div>
-      <div class="hstat"><span class="hstat-val">{{ unsoldCount }}</span><span class="hstat-lbl">Unsold</span></div>
+    <div class="header-right">
+      <button mat-raised-button class="btn-add-player-page" (click)="openAddPlayerDialog()"
+              id="add-player-btn">
+        <mat-icon>person_add</mat-icon>
+        Add Player
+      </button>
+      <div class="header-stats">
+        <div class="hstat"><span class="hstat-val">{{ totalPlayers }}</span><span class="hstat-lbl">Total</span></div>
+        <div class="hstat"><span class="hstat-val sold-val">{{ soldCount }}</span><span class="hstat-lbl">Sold</span></div>
+        <div class="hstat"><span class="hstat-val">{{ unsoldCount }}</span><span class="hstat-lbl">Unsold</span></div>
+      </div>
     </div>
   </div>
 

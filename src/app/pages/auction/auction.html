@@ -153,6 +153,18 @@
               ❌ UNSOLD
             </button>
           </div>
+
+          <!-- ↩ Revert Last Bid -->
+          <div class="revert-row">
+            <button mat-stroked-button class="btn-revert"
+                    id="revert-last-bid-btn"
+                    [disabled]="!canRevert"
+                    [matTooltip]="canRevert ? 'Undo the last bid placed' : 'No bids to revert'"
+                    (click)="revertLastBid()">
+              <mat-icon>undo</mat-icon>
+              Revert Last Bid
+            </button>
+          </div>
         }
 
         <mat-divider class="section-divider"></mat-divider>
@@ -226,35 +238,6 @@
           </div>
           <mat-divider class="section-divider"></mat-divider>
         }
-
-        <!-- Bid History -->
-        <div class="bid-history-section">
-          <h4 class="sub-heading">
-            <mat-icon>history</mat-icon> Bid History
-          </h4>
-
-          @if (recentBids.length === 0) {
-            <p class="empty-history">No bids yet.</p>
-          } @else {
-            <div class="bid-history-scroll">
-              <div class="bid-history-list">
-              @for (bid of recentBids; track bid.timestamp; let i = $index) {
-                <div class="bid-history-item" [class.bid-history-latest]="i === 0">
-                  <span class="bid-history-dot"
-                        [style.background]="getTeamById(bid.teamId)?.colorCode ?? '#fff'">
-                  </span>
-                  <span class="bid-history-team">
-                    @if (bid.type === 'opening') { 🏏 }
-                    {{ getTeamById(bid.teamId)?.shortName ?? bid.teamId }}
-                  </span>
-                  <span class="bid-history-amount">{{ formatAmount(bid.bidAmount) }}</span>
-                  <span class="bid-history-time">{{ formatTime(bid.timestamp) }}</span>
-                </div>
-              }
-              </div>
-            </div>
-          }
-        </div>
 
       </mat-card-content>
     </mat-card>

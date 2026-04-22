@@ -30,6 +30,7 @@ import {
   PlayerDialogData,
 } from '../../components/player-profile-dialog/player-profile-dialog';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { AddPlayerDialogComponent } from '../../components/add-player-dialog/add-player-dialog';
 
 @Component({
   selector: 'app-players',
@@ -169,6 +170,21 @@ export class Players implements OnInit, OnDestroy, AfterViewInit {
   get hasActiveFilter(): boolean {
     return this.searchQuery !== '' || this.roleFilter !== 'All' ||
            this.statusFilter !== 'All' || this.countryFilter !== 'All';
+  }
+
+  // ── Add Player Dialog ──────────────────────────────────────────────────────
+
+  openAddPlayerDialog(): void {
+    const ref = this.dialog.open(AddPlayerDialogComponent, {
+      width: '500px',
+      maxWidth: '96vw',
+      maxHeight: '90vh',
+      panelClass: 'dark-dialog',
+      disableClose: false,
+    });
+    ref.afterClosed().subscribe((result: string | undefined) => {
+      if (result === 'added') this.refreshState();
+    });
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────

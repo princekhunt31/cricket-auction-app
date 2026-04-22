@@ -188,28 +188,35 @@ $radius:      16px;
 // Avatar
 .player-avatar-wrap {
   position: relative;
-  width: 110px;
-  height: 110px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   margin: 8px auto 20px;
+  animation: player-fade-in 0.5s ease forwards;
 }
 .player-avatar {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba($gold, 0.4);
+  border: 3px solid $gold;
+  box-shadow: 0 0 20px rgba(255,215,0,0.4);
   position: relative;
   z-index: 1;
 }
 .player-avatar-ring {
   position: absolute;
-  inset: -4px;
+  inset: -5px;
   border-radius: 50%;
   background: conic-gradient($gold, $amber, $gold);
   z-index: 0;
   animation: spin 4s linear infinite;
-  opacity: 0.5;
+  opacity: 0.6;
+}
+
+@keyframes player-fade-in {
+  from { opacity: 0; transform: scale(0.82); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .player-name {
@@ -897,3 +904,44 @@ $radius:      16px;
   filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
 }
 
+
+// ── Revert Last Bid ────────────────────────────
+
+$orange: #ff9800;
+
+.revert-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0 2px;
+}
+
+.btn-revert {
+  border-color: rgba($orange, 0.5) !important;
+  color: $orange !important;
+  border-radius: 10px !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s !important;
+
+  mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
+    vertical-align: middle;
+  }
+
+  &:not([disabled]):hover {
+    border-color: $orange !important;
+    background: rgba($orange, 0.08) !important;
+    box-shadow: 0 0 10px rgba($orange, 0.2) !important;
+  }
+
+  &[disabled] {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.22) !important;
+    cursor: not-allowed !important;
+  }
+}

@@ -51,11 +51,26 @@ $radius:   16px;
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .page-subtitle{ font-size: .82rem; color: $muted; margin: 0; }
 
-.header-stats { display: flex; gap: 24px; }
-.hstat        { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.hstat-val    { font-size: 1.5rem; font-weight: 800; color: $gold; }
+.header-right  { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; justify-content: flex-end; }
+.header-stats  { display: flex; gap: 24px; }
+.hstat         { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.hstat-val     { font-size: 1.5rem; font-weight: 800; color: $gold; }
 .hstat-val.sold-val { color: $green; }
-.hstat-lbl    { font-size: .7rem; text-transform: uppercase; letter-spacing: .8px; color: $muted; }
+.hstat-lbl     { font-size: .7rem; text-transform: uppercase; letter-spacing: .8px; color: $muted; }
+
+.btn-add-player-page {
+  background: linear-gradient(135deg, $amber, $gold) !important;
+  color: #0a0e1a !important;
+  font-weight: 700 !important;
+  border-radius: 12px !important;
+  padding: 0 18px !important;
+  height: 42px !important;
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.2) !important;
+  transition: box-shadow 0.2s, transform 0.15s !important;
+  white-space: nowrap;
+  mat-icon { margin-right: 6px !important; font-size: 20px !important; }
+  &:hover { box-shadow: 0 6px 22px rgba(255, 215, 0, 0.35) !important; transform: translateY(-1px) !important; }
+}
 
 // ── Filter Bar ────────────────────────────────
 .filter-bar {
